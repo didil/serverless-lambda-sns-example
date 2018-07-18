@@ -1,0 +1,56 @@
+# NOTE: update this with your service name
+service: serverless-lambda-sns-example
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-offline-sns
+
+# serverless-webpack configuration
+# Enable auto-packing of external modules
+custom:
+  webpack:
+    includeModules:
+      forceExclude:
+        - aws-sdk
+  serverless-offline-sns:
+    port: 4002 # a free port for the sns server to run on
+    debug: true
+  mySnsTopic: "${self:service}-${self:provider.stage}-sns-consume"
+  mySnsTopicArn:
+    local:
+      "arn:aws:sns:us-east-1:123456789012:${self:custom.mySnsTopic}"
+    dev:
+      { "Fn::Join" : ["", ["arn:aws:sns:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":${self:custom.mySnsTopic}" ] ]  }
+    prod:
+     { "Fn::Join" : ["", ["arn:aws:sns:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":${self:custom.mySnsTopic}" ] ]  }
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage,'dev'}
+  region: ${opt:region, 'us-east-1'}  
+  environment: ${file(env.yml):${self:provider.stage}}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource: { "Fn::Join" : ["", ["arn:aws:sns:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":${self:custom.mySnsTopic}" ] ]  }
+
+functions:
+  snsConsume:
+    handler: functions/snsConsume.handler
+    events:
+      - sns: ${self:custom.mySnsTopic}
+  snsPublish:
+    handler: functions/snsPublish.handler
+    events:
+      - http:
+          path: snsPublish
+          method: post
+          cors: true
+    environment:
+      mySnsTopicArn: ${self:custom.mySnsTopicArn.${self:provider.stage}}
+
+
+

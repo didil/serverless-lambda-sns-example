@@ -1,0 +1,30 @@
+{
+  "name": "serverless-lambda-sns-example",
+  "version": "0.5.0",
+  "description": "Serverless Lambda SNS example",
+  "main": "",
+  "engines": {
+    "node": "8.10"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test PORT=9100 ./node_modules/.bin/mocha --opts mocha.opts",
+    "offline": "sls offline start"
+  },
+  "author": "Adil H",
+  "license": "MIT",
+  "repository": {},
+  "devDependencies": {
+    "aws-sdk": "^2.275.1",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "serverless-offline": "^3.25.6",
+    "serverless-webpack": "^5.2.0",
+    "serverless-offline-sns": "^0.46.0",
+    "sinon": "^6.1.3",
+    "supertest": "^3.1.0",
+    "webpack": "^4.16.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+  }
+}
